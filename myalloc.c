@@ -33,6 +33,18 @@ void split_space(struct block *current_node, int requested_size) {
 void myfree(void *p) {
     struct block *accessed_node = p - padded_size_of_block;
     accessed_node->in_use = 0;
+
+    struct block *loop_node = head;
+
+    while(loop_node->next != NULL) {
+        if (!loop_node->in_use && !loop_node->next->in_use) {
+            loop_node->size = loop_node->size + loop_node->next->size + padded_size_of_block;
+            loop_node->next = loop_node->next->next;
+        }
+        else {
+            loop_node = loop_node->next;
+        }
+    }
 }
 
 void *myalloc(int size) {
@@ -84,13 +96,16 @@ void print_data(void)
 }
 
 int main(void) {
-    void *p;
+    void *p, *q, *r, *s;
 
-    myalloc(10);     print_data();
-    p = myalloc(20); print_data();
-    myalloc(30);     print_data();
-    myfree(p);       print_data();
-    myalloc(40);     print_data();
-    myalloc(10);     print_data();
+    p = myalloc(10); print_data();
+    q = myalloc(20); print_data();
+    r = myalloc(30); print_data();
+    s = myalloc(40); print_data();
+
+    myfree(q); print_data();
+    myfree(p); print_data();
+    myfree(s); print_data();
+    myfree(r); print_data();
 }
 
